@@ -27,10 +27,20 @@ AI_KEYWORDS = [
 ]
 
 RSS_FEEDS = [
-    ("TechCrunch AI",  "https://techcrunch.com/category/artificial-intelligence/feed/"),
-    ("VentureBeat AI", "https://venturebeat.com/category/ai/feed/"),
-    ("MIT Tech Review","https://www.technologyreview.com/topic/artificial-intelligence/feed"),
-    ("The Verge AI",   "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"),
+    # Tech news with strong AI coverage
+    ("TechCrunch AI",   "https://techcrunch.com/category/artificial-intelligence/feed/"),
+    ("VentureBeat AI",  "https://venturebeat.com/category/ai/feed/"),
+    ("MIT Tech Review", "https://www.technologyreview.com/topic/artificial-intelligence/feed"),
+    ("The Verge AI",    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"),
+    ("Wired AI",        "https://www.wired.com/feed/tag/artificial-intelligence/latest/rss"),
+    ("Ars Technica AI", "https://feeds.arstechnica.com/arstechnica/index"),
+    ("ZDNet AI",        "https://www.zdnet.com/topic/artificial-intelligence/rss.xml"),
+    # AI lab blogs (no key needed)
+    ("Google DeepMind", "https://deepmind.google/blog/rss.xml"),
+    ("OpenAI Blog",     "https://openai.com/news/rss.xml"),
+    ("Anthropic Blog",  "https://www.anthropic.com/rss.xml"),
+    # Dedicated AI news
+    ("AI News",         "https://www.artificialintelligence-news.com/feed/"),
 ]
 
 def fetch_url(url: str, timeout: int = 10) -> bytes | None:
