@@ -13,6 +13,9 @@ on:
         type: choice
         options: ['false', 'true']
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Minimal permissions — only what's needed
 permissions:
   contents: write
