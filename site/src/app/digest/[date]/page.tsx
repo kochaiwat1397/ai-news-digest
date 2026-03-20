@@ -1,9 +1,8 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import DigestViewer from '../components/DigestViewer'
-import ArchiveSidebar from '../components/ArchiveSidebar'
+import DigestViewer from '../../../components/DigestViewer'
+import ArchiveSidebar from '../../../components/ArchiveSidebar'
 
-// Reads digest files directly from the repo (works for static export + GitHub Pages)
 const DIGESTS_DIR = join(process.cwd(), '..', 'digests')
 
 function getAvailableDates(): string[] {
@@ -26,9 +25,20 @@ function getDigestContent(date: string): string {
   }
 }
 
-export default function Home() {
+export function generateStaticParams() {
   const dates = getAvailableDates()
-  const selectedDate = dates[0] || new Date().toISOString().split('T')[0]
+  return dates.map(date => ({
+    date: date,
+  }))
+}
+
+interface PageProps {
+  params: { date: string }
+}
+
+export default function DigestPage({ params }: PageProps) {
+  const dates = getAvailableDates()
+  const selectedDate = params.date
   const content = getDigestContent(selectedDate)
 
   return (

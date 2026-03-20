@@ -24,7 +24,7 @@ export default function ArchiveSidebar({ dates, selectedDate }: Props) {
           return (
             <Link
               key={date}
-              href={`/?date=${date}`}
+              href={`/digest/${date}`}
               className={`block text-xs px-3 py-2 rounded-md transition-colors ${
                 isSelected
                   ? 'bg-[#a78bfa]/20 text-[#a78bfa] font-medium'
