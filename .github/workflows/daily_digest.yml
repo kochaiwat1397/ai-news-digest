@@ -30,20 +30,15 @@ jobs:
         with:
           fetch-depth: 1
 
-      # ── 2. Setup runtimes ───────────────────────────────────────────────────
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
+      # ── 2. Setup Python ─────────────────────────────────────────────────────
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # ── 3. Install Claude Code ──────────────────────────────────────────────
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+      # ── 3. Install Python dependencies ─────────────────────────────────────
+      - name: Install Python dependencies
+        run: pip install openai
 
       # ── 4. Fetch + Generate ─────────────────────────────────────────────────
       - name: Fetch news articles
@@ -60,21 +55,12 @@ jobs:
             exit 1
           fi
 
-      - name: Generate digest with Claude (headless)
+      - name: Generate digest with OpenAI
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           TODAY=$(date -u +%Y-%m-%d)
-          PROMPT="Today is ${TODAY}. Using the instructions in CLAUDE.md, generate the daily AI news digest from the following articles. Output ONLY the markdown digest — no preamble, no code fences.
-
-          Articles:
-          $(cat /tmp/articles.json)"
-
-          claude -p "$PROMPT" \
-            --output-format text \
-            --max-turns 3 \
-            > "digests/${TODAY}.md"
-
+          python3 scripts/generate_digest.py /tmp/articles.json > "digests/${TODAY}.md"
           echo "DIGEST_PATH=digests/${TODAY}.md" >> $GITHUB_ENV
           echo "TODAY=${TODAY}" >> $GITHUB_ENV
 

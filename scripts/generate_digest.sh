@@ -25,19 +25,10 @@ if [ "$ARTICLE_COUNT" -lt 5 ]; then
   exit 1
 fi
 
-echo "▶ Running Claude to generate digest..."
+echo "▶ Running OpenAI to generate digest..."
 
-# Build the prompt that references CLAUDE.md implicitly (Claude Code reads it from CWD)
-PROMPT="Today is ${TODAY}. Using the instructions in CLAUDE.md, generate the daily AI news digest from the following articles. Output only the markdown digest, nothing else.
-
-Articles JSON:
-$(cat "$ARTICLES_FILE")"
-
-# Run Claude headlessly — -p flag = non-interactive / pipe mode
-claude -p "$PROMPT" \
-  --output-format text \
-  --max-turns 3 \
-  > "$DIGEST_PATH"
+# Call OpenAI via the Python script (reads CLAUDE.md automatically)
+python3 scripts/generate_digest.py "$ARTICLES_FILE" > "$DIGEST_PATH"
 
 echo "▶ Digest written to ${DIGEST_PATH}"
 
