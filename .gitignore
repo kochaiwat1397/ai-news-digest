@@ -1,0 +1,23 @@
+# Node
+node_modules/
+.next/
+out/
+.npm
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Env — never commit real keys
+.env
+.env.local
+.env*.local
+
+# Temp files
+/tmp/
+*.json.tmp
+
+# OS
+.DS_Store
+Thumbs.db

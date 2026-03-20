@@ -1,0 +1,142 @@
+name: Daily AI News Digest
+
+on:
+  schedule:
+    # 07:00 UTC daily — Bangkok time 14:00 WIB+1 / 14:00 ICT
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (do not commit)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+# Minimal permissions — only what's needed
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── 1. Checkout ─────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ── 2. Setup runtimes ───────────────────────────────────────────────────
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ── 3. Install Claude Code ──────────────────────────────────────────────
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      # ── 4. Fetch + Generate ─────────────────────────────────────────────────
+      - name: Fetch news articles
+        env:
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        run: python3 scripts/fetch_news.py > /tmp/articles.json
+
+      - name: Validate article count
+        run: |
+          COUNT=$(python3 -c "import json; d=json.load(open('/tmp/articles.json')); print(len(d))")
+          echo "Article count: $COUNT"
+          if [ "$COUNT" -lt 5 ]; then
+            echo "::error::Too few articles ($COUNT). Check API keys."
+            exit 1
+          fi
+
+      - name: Generate digest with Claude (headless)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          PROMPT="Today is ${TODAY}. Using the instructions in CLAUDE.md, generate the daily AI news digest from the following articles. Output ONLY the markdown digest — no preamble, no code fences.
+
+          Articles:
+          $(cat /tmp/articles.json)"
+
+          claude -p "$PROMPT" \
+            --output-format text \
+            --max-turns 3 \
+            > "digests/${TODAY}.md"
+
+          echo "DIGEST_PATH=digests/${TODAY}.md" >> $GITHUB_ENV
+          echo "TODAY=${TODAY}" >> $GITHUB_ENV
+
+      - name: Validate digest output
+        run: |
+          LEN=$(wc -c < "$DIGEST_PATH")
+          echo "Digest size: ${LEN} bytes"
+          if [ "$LEN" -lt 300 ]; then
+            echo "::error::Digest too short (${LEN} bytes). Claude may have failed."
+            cat "$DIGEST_PATH"
+            exit 1
+          fi
+
+      # ── 5. Commit (unless dry run) ──────────────────────────────────────────
+      - name: Commit digest to repository
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name  "claude-digest-bot"
+          git config user.email "claude-bot@users.noreply.github.com"
+          git add "digests/"
+          git diff --staged --quiet && echo "No changes to commit" || \
+            git commit -m "digest: ${TODAY} [skip ci]"
+          git push
+
+      # ── 6. Optional: open PR for human review ──────────────────────────────
+      # Uncomment the block below if you want a PR review step instead of
+      # direct commit. Requires: gh CLI (pre-installed on ubuntu-latest).
+      #
+      # - name: Open PR for digest review
+      #   if: ${{ github.event.inputs.dry_run != 'true' }}
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     BRANCH="digest/${TODAY}"
+      #     git checkout -b "$BRANCH"
+      #     git add "digests/"
+      #     git commit -m "digest: ${TODAY}"
+      #     git push origin "$BRANCH"
+      #     gh pr create \
+      #       --title "Daily digest: ${TODAY}" \
+      #       --body "Auto-generated AI news digest. Review and merge to publish." \
+      #       --base main \
+      #       --head "$BRANCH" \
+      #       --label "ai-digest"
+
+      # ── 7. Post to Slack (optional) ─────────────────────────────────────────
+      # Set SLACK_WEBHOOK secret and uncomment:
+      #
+      # - name: Post digest summary to Slack
+      #   if: ${{ secrets.SLACK_WEBHOOK != '' }}
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #   run: |
+      #     HEADLINE=$(head -5 "$DIGEST_PATH" | tail -1)
+      #     URL="https://YOUR_ORG.github.io/ai-news-digest/digest/${TODAY}"
+      #     curl -s -X POST "$SLACK_WEBHOOK" \
+      #       -H "Content-type: application/json" \
+      #       -d "{\"text\":\"📰 *AI Daily Digest — ${TODAY}*\n${HEADLINE}\n<${URL}|Read full digest>\"}"
+
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ env.TODAY }}
+          path: ${{ env.DIGEST_PATH }}
+          retention-days: 30
