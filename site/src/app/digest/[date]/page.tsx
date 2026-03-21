@@ -3,6 +3,7 @@ import { join } from 'path'
 import DigestViewer from '@/components/DigestViewer'
 import ArchiveSidebar from '@/components/ArchiveSidebar'
 import SearchBar from '@/components/SearchBar'
+import Link from 'next/link'
 
 const DIGESTS_DIR = join(process.cwd(), '..', 'digests')
 
@@ -49,6 +50,9 @@ export default function DigestPage({ params }: PageProps) {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/timeline" className="text-[11px] font-medium text-white/60 hover:text-white transition-colors">
+              Timeline
+            </Link>
             <SearchBar />
             <span className="text-[11px] font-mono text-white/25 hidden sm:inline">{selectedDate}</span>
             <span className="h-4 w-px bg-white/10 hidden sm:inline" />
