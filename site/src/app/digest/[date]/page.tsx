@@ -1,7 +1,8 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import DigestViewer from '../../../components/DigestViewer'
-import ArchiveSidebar from '../../../components/ArchiveSidebar'
+import DigestViewer from '@/components/DigestViewer'
+import ArchiveSidebar from '@/components/ArchiveSidebar'
+import SearchBar from '@/components/SearchBar'
 
 const DIGESTS_DIR = join(process.cwd(), '..', 'digests')
 
@@ -48,6 +49,7 @@ export default function DigestPage({ params }: PageProps) {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <SearchBar />
             <span className="text-[11px] font-mono text-white/25 hidden sm:inline">{selectedDate}</span>
             <span className="h-4 w-px bg-white/10 hidden sm:inline" />
             <span className="text-[11px] text-white/25 hidden sm:inline">Daily · Automated</span>

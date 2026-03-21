@@ -27,12 +27,13 @@ export default function ArchiveSidebar({ dates }: Props) {
       </p>
 
       <nav className="space-y-5">
-        {Object.entries(grouped).map(([month, monthDates]) => (
-          <div key={month}>
-            <p className="text-[10px] font-medium text-white/25 uppercase tracking-wider mb-1.5 px-2">
+        {Object.entries(grouped).map(([month, monthDates], idx) => (
+          <details key={month} open={idx === 0} className="group">
+            <summary className="cursor-pointer list-none select-none text-[10px] items-center font-medium text-white/30 hover:text-white/60 uppercase tracking-wider mb-2 px-2 flex gap-1.5 [&::-webkit-details-marker]:hidden transition-colors">
+              <span className="text-[8px] transform transition-transform group-open:rotate-90 opacity-60">▶</span>
               {month}
-            </p>
-            <div className="space-y-0.5">
+            </summary>
+            <div className="space-y-0.5 ml-2 border-l border-white/5 pl-2 mb-5">
               {monthDates.map(date => {
                 const isHome = pathname === '/' && monthDates[0] === date && dates[0] === date
                 const isDigest = pathname === `/digest/${date}`
@@ -45,7 +46,7 @@ export default function ArchiveSidebar({ dates }: Props) {
                   <Link
                     key={date}
                     href={date === dates[0] ? '/' : `/digest/${date}`}
-                    className={`group flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg
+                    className={`group/link flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg
                       transition-all duration-150 ${
                         isActive
                           ? 'bg-gradient-to-r from-accent/20 to-accent-blue/10 text-white font-medium border border-accent/20'
@@ -60,7 +61,7 @@ export default function ArchiveSidebar({ dates }: Props) {
                 )
               })}
             </div>
-          </div>
+          </details>
         ))}
       </nav>
     </aside>
