@@ -87,7 +87,7 @@ export default function SearchBar() {
           <button onClick={() => setIsOpen(false)} className="text-[10px] text-white/40 hover:text-white px-2 py-1 rounded bg-white/5 uppercase font-medium">Esc</button>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto p-2">
+        <div className="max-h-[60vh] overflow-y-auto p-4 relative">
           {!query && (
              <div className="p-6 text-center text-white/20 text-xs">
                 Start typing to scan {allData.length} articles globally.
@@ -96,23 +96,35 @@ export default function SearchBar() {
           {query && results.length === 0 && (
             <div className="p-6 text-center text-white/40 text-sm">No results found for "{query}"</div>
           )}
-          {results.map((item, i) => (
-            <a 
-              key={i} 
-              href={item.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block p-3 hover:bg-white/5 rounded-xl transition-colors group"
-              onClick={() => setIsOpen(false)}
-            >
-              <div className="flex items-center justify-between mb-1.5 text-[10px] text-white/30">
-                <span className="font-mono bg-white/5 px-1.5 rounded text-white/40">{item.date}</span>
-                <span className="px-1.5 py-[1px] bg-white/5 text-white/50 rounded border border-white/10 uppercase tracking-wide">{item.source}</span>
+          
+          {/* Vertical timeline line */}
+          {results.length > 0 && (
+             <div className="absolute left-[29px] top-6 bottom-4 w-px bg-gradient-to-b from-accent/40 via-white/10 to-transparent" />
+          )}
+
+          <div className="space-y-2">
+            {results.map((item, i) => (
+              <div key={i} className="relative pl-10">
+                {/* Timeline dot */}
+                <div className="absolute left-[9px] top-6 w-2 h-2 rounded-full bg-accent ring-4 ring-[#0f1117]" />
+                
+                <a 
+                  href={item.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block p-3 hover:bg-[#141928] rounded-xl border border-transparent hover:border-accent/30 transition-all duration-300 group"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <div className="flex items-center justify-between mb-1.5 text-[10px] text-white/30">
+                    <span className="font-mono bg-white/5 border border-white/5 px-1.5 rounded text-white/40">{item.date}</span>
+                    <span className="px-1.5 py-[1px] bg-white/5 text-white/50 rounded border border-white/10 uppercase tracking-wide">{item.source}</span>
+                  </div>
+                  <h4 className="text-white/90 text-sm font-medium leading-snug mb-1 group-hover:text-white transition-colors line-clamp-1">{item.title}</h4>
+                  <p className="text-white/40 text-xs line-clamp-2">{item.summary}</p>
+                </a>
               </div>
-              <h4 className="text-white/90 text-sm font-medium leading-snug mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">{item.title}</h4>
-              <p className="text-white/40 text-xs line-clamp-2">{item.summary}</p>
-            </a>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </>
