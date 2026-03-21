@@ -49,4 +49,4 @@ Output ONLY the following markdown — no preamble, no commentary, no code fence
 3. Skip articles that are clearly listicles, sponsored content, or opinion pieces.
 4. If a category has no articles, omit that section entirely.
 5. Total digest: max 800 words. Quality over quantity.
-6. Always include the source URL — never invent or modify URLs.
+6. CRITICAL: For the `[Read →]({url})` link, you MUST perfectly copy the exact string from the `url` field in the JSON array. DO NOT invent, guess, modify, or shorten URLs under any circumstances.
