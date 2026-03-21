@@ -57,7 +57,7 @@ export default function DigestPage({ params }: PageProps) {
 
       <div className="flex max-w-6xl mx-auto">
         <ArchiveSidebar dates={dates} />
-        <main className="flex-1 min-w-0 px-10 py-10 max-w-3xl">
+        <main className="flex-1 min-w-0 px-8 py-8">
           <DigestViewer content={content} date={selectedDate} />
         </main>
       </div>
