@@ -36,10 +36,9 @@ jobs:
 
       - name: Build Next.js site
         working-directory: site
-        env:
-          # Needed for static export to GitHub Pages subdirectory
-          NEXT_PUBLIC_BASE_PATH: ''
-        run: npm run build
+        run: |
+          npm run build
+          touch out/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

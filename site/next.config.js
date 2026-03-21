@@ -7,7 +7,6 @@ const nextConfig = {
   images: { unoptimized: true },
   // Required for GitHub Pages: repo is served under /ai-news-digest/
   basePath: isProd ? '/ai-news-digest' : '',
-  assetPrefix: isProd ? '/ai-news-digest/' : '',
 }
 
 module.exports = nextConfig
