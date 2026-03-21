@@ -48,9 +48,16 @@ function PageLayout({ dates, selectedDate, content }: {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-mono text-white/25">{selectedDate}</span>
+            <span className="text-[11px] font-mono text-white/25 hidden sm:inline">{selectedDate}</span>
+            <span className="h-4 w-px bg-white/10 hidden sm:inline" />
+            <span className="text-[11px] text-white/25 hidden sm:inline">Daily · Automated</span>
             <span className="h-4 w-px bg-white/10" />
-            <span className="text-[11px] text-white/25">Daily · Automated · OpenAI</span>
+            <a href="https://github.com/kochaiwat1397/ai-news-digest/actions/workflows/daily_digest.yml"
+               target="_blank" rel="noopener noreferrer"
+               className="text-[11px] font-medium text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1.5"
+               title="Temporarily pause daily automation">
+               ⏸️ Pause
+            </a>
           </div>
         </div>
       </header>
