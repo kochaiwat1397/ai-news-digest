@@ -2,8 +2,8 @@ name: Daily AI News Digest
 
 on:
   schedule:
-    # 07:00 UTC daily — Bangkok time 14:00 WIB+1 / 14:00 ICT
-    - cron: '0 7 * * *'
+    # 01:00 UTC daily — Bangkok time 08:00 ICT
+    - cron: '0 1 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
