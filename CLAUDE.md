@@ -20,7 +20,9 @@ Output ONLY the following markdown — no preamble, no commentary, no code fence
 ## 🔬 Research & Models
 <!-- 2-3 articles in this theme if present -->
 ### {Article title}
-{2-sentence plain-English summary. What changed, why it matters.}
+**TL;DR:** {1-sentence executive summary. The core impact.}
+- {Bullet point with specific details/context}
+- {Bullet point with specific details/context}
 [Read →]({url}) — *{source}*
 
 ## 🏭 Industry & Products

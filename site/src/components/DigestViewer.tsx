@@ -5,6 +5,7 @@ interface Article {
   summary: string
   url: string
   source: string
+  details: string[]
 }
 
 interface Section {
@@ -34,14 +35,15 @@ function parseDigest(markdown: string): { title: string; sections: Section[]; fo
   let footer = ''
   const sections: Section[] = []
   let currentSection: Section | null = null
-  let currentArticle: Partial<Article> | null = null
+  let currentArticle: Partial<Article> & { details?: string[] } | null = null
   let summaryLines: string[] = []
 
   function saveArticle() {
     if (currentSection && currentArticle?.title) {
       currentSection.articles.push({
         title: currentArticle.title,
-        summary: summaryLines.join(' ').trim().slice(0, 160),
+        summary: currentArticle.summary || summaryLines.join(' ').trim().slice(0, 160),
+        details: currentArticle.details || [],
         url: currentArticle.url || '#',
         source: currentArticle.source || '',
       })
@@ -62,7 +64,7 @@ function parseDigest(markdown: string): { title: string; sections: Section[]; fo
       currentSection = { emoji, label: label.replace(emoji, '').trim(), ...style, articles: [] }
     } else if (line.startsWith('### ')) {
       saveArticle()
-      currentArticle = { title: line.slice(4).trim() }
+      currentArticle = { title: line.slice(4).trim(), details: [] }
     } else if (line.startsWith('[') && currentArticle) {
       const linkMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/)
       const sourceMatch = line.match(/—\s*\*([^*]+)\*/)
@@ -71,7 +73,14 @@ function parseDigest(markdown: string): { title: string; sections: Section[]; fo
     } else if (line.startsWith('---') || line.startsWith('*')) {
       footer = line.replace(/^\*|\*$/g, '').trim()
     } else if (line.trim() && currentArticle) {
-      summaryLines.push(line.trim())
+      const trimmed = line.trim()
+      if (trimmed.startsWith('**TL;DR:**')) {
+        currentArticle.summary = trimmed.replace('**TL;DR:**', '').trim()
+      } else if (trimmed.startsWith('- ')) {
+        currentArticle.details?.push(trimmed.slice(2).trim())
+      } else {
+        summaryLines.push(trimmed)
+      }
     }
   }
 
@@ -117,37 +126,52 @@ export default function DigestViewer({ content, date }: Props) {
           {/* Article cards grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {section.articles.map((article, i) => (
-              <a
+              <div
                 key={i}
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group block rounded-xl border ${section.border} bg-[#0f1117]
-                  hover:bg-[#141928] transition-all duration-200 p-4 no-underline
+                className={`group rounded-xl border ${section.border} bg-[#0f1117]
+                  hover:bg-[#141928] transition-all duration-200 p-4 relative flex flex-col
                   hover:border-opacity-70 hover:shadow-lg hover:-translate-y-0.5`}
               >
-                {/* Title */}
-                <p className="text-[0.8rem] font-semibold text-white/90 leading-snug mb-2 line-clamp-2
-                  group-hover:text-white transition-colors">
+                {/* Title (Clickable card overlay) */}
+                <a href={article.url} target="_blank" rel="noopener noreferrer" 
+                   className="text-[0.8rem] text-white/90 leading-snug font-semibold line-clamp-2
+                  hover:text-white transition-colors block mb-2 after:absolute after:inset-0 outline-none">
                   {article.title}
-                </p>
+                </a>
 
-                {/* Summary */}
+                {/* TLDR Summary */}
                 <p className="text-[0.72rem] text-white/40 leading-relaxed line-clamp-2 mb-3">
                   {article.summary}
                 </p>
 
+                {/* Expandable Details */}
+                {article.details.length > 0 && (
+                  <details className="mb-3 relative z-10">
+                    <summary className="text-[10px] text-white/20 hover:text-white/40 cursor-pointer select-none font-medium mb-1.5 transition-colors">
+                      View full details
+                    </summary>
+                    <ul className="space-y-1.5 mt-2 mb-2">
+                      {article.details.map((detail, j) => (
+                        <li key={j} className="text-[0.72rem] text-white/50 leading-relaxed pl-3 relative before:content-['·'] before:absolute before:left-0 before:text-white/20">
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+
                 {/* Footer */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10 mt-auto pt-1">
                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full
                     ${section.bg} ${section.color} border ${section.border}`}>
                     {article.source}
                   </span>
-                  <span className="text-[11px] text-white/25 group-hover:text-white/60 transition-colors">
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" 
+                    className="text-[11px] text-white/25 hover:text-white/60 transition-colors">
                     Read →
-                  </span>
+                  </a>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
