@@ -9,7 +9,7 @@ A fully automated daily AI news digest — articles fetched from NewsAPI, RSS fe
 ```
 News APIs / RSS / HackerNews
         ↓
-GitHub Actions (cron 07:00 UTC)
+GitHub Actions (cron 01:00 UTC)
         ↓
 scripts/fetch_news.py  →  /tmp/articles.json
         ↓

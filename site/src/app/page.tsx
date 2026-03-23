@@ -3,7 +3,6 @@ import { join } from 'path'
 import DigestViewer from '@/components/DigestViewer'
 import ArchiveSidebar from '@/components/ArchiveSidebar'
 import SearchBar from '@/components/SearchBar'
-import SearchColumn from '@/components/SearchColumn'
 import Link from 'next/link'
 
 const DIGESTS_DIR = join(process.cwd(), '..', 'digests')
@@ -73,13 +72,12 @@ function PageLayout({ dates, selectedDate, content }: {
         <ArchiveSidebar dates={dates} />
       </div>
 
-      <div className="flex-1 flex flex-col relative z-10 w-full ml-0 sm:ml-56 lg:mr-72">
+      <div className="flex-1 flex flex-col relative z-10 w-full ml-0 sm:ml-56">
         <main className="flex-1 min-w-0 px-8 py-8">
           <DigestViewer content={content} date={selectedDate} />
         </main>
       </div>
 
-      <SearchColumn />
     </div>
   )
 }
