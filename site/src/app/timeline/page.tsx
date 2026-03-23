@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import SearchBar from '@/components/SearchBar'
+
 import SearchColumn from '@/components/SearchColumn'
 import Link from 'next/link'
 import TimelineContent from '@/components/TimelineContent'
@@ -33,7 +33,7 @@ export default function TimelinePage() {
     <div className="flex min-h-screen bg-[#080b12] text-white/90 selection:bg-accent/30 selection:text-white relative">
       <div className="fixed inset-0 bg-glow pointer-events-none" />
 
-      <div className="flex-1 flex flex-col relative z-10 w-full ml-0 sm:ml-56 lg:mr-72">
+      <div className="flex-1 flex flex-col relative z-10 sm:ml-56 lg:mr-72">
         
         <header className="sticky top-0 z-40 bg-[#080b12]/80 backdrop-blur-xl border-b border-light/5">
           <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
@@ -47,7 +47,7 @@ export default function TimelinePage() {
               <Link href="/timeline" className="text-[11px] font-medium text-white transition-colors underline decoration-accent decoration-2 underline-offset-4">
                 Timeline
               </Link>
-              <SearchBar />
+
               <a href="https://github.com/kochaiwat1397/ai-news-digest/actions/workflows/daily_digest.yml"
                  target="_blank" rel="noopener noreferrer"
                  className="text-[11px] font-medium text-white/60 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1.5"

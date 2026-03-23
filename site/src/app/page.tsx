@@ -2,8 +2,8 @@ import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
 import DigestViewer from '@/components/DigestViewer'
 import ArchiveSidebar from '@/components/ArchiveSidebar'
-import SearchBar from '@/components/SearchBar'
 import Link from 'next/link'
+import SearchColumn from '@/components/SearchColumn'
 
 const DIGESTS_DIR = join(process.cwd(), '..', 'digests')
 
@@ -53,7 +53,6 @@ function PageLayout({ dates, selectedDate, content }: {
             <Link href="/timeline" className="text-[11px] font-medium text-white/60 hover:text-white transition-colors">
               Timeline
             </Link>
-            <SearchBar />
             <span className="text-[11px] font-mono text-white/25 hidden sm:inline">{selectedDate}</span>
             <span className="h-4 w-px bg-white/10 hidden sm:inline" />
             <span className="text-[11px] text-white/25 hidden sm:inline">Daily · Automated</span>
@@ -72,12 +71,13 @@ function PageLayout({ dates, selectedDate, content }: {
         <ArchiveSidebar dates={dates} />
       </div>
 
-      <div className="flex-1 flex flex-col relative z-10 w-full ml-0 sm:ml-56">
-        <main className="flex-1 min-w-0 px-8 py-8">
+      <div className="flex-1 flex flex-col relative z-10 sm:ml-56 lg:mr-72">
+        <main className="flex-1 min-w-0 px-8 py-8 overflow-x-auto">
           <DigestViewer content={content} date={selectedDate} />
         </main>
       </div>
 
+      <SearchColumn />
     </div>
   )
 }
