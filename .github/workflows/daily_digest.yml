@@ -77,37 +77,39 @@ jobs:
             exit 1
           fi
 
+      - name: Verify and clean broken links
+        run: python3 scripts/verify_links.py "$DIGEST_PATH"
+
       # ── 5. Commit (unless dry run) ──────────────────────────────────────────
-      - name: Commit digest to repository
+      # - name: Commit digest to repository
+      #   if: ${{ github.event.inputs.dry_run != 'true' }}
+      #   run: |
+      #     git config user.name  "claude-digest-bot"
+      #     git config user.email "claude-bot@users.noreply.github.com"
+      #     git add "digests/"
+      #     git diff --staged --quiet && echo "No changes to commit" || \
+      #       git commit -m "digest: ${TODAY} [skip ci]"
+      #     git push
+
+      # ── 6. Optional: open PR for human review ──────────────────────────────
+      - name: Open PR for digest review
         if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name  "claude-digest-bot"
           git config user.email "claude-bot@users.noreply.github.com"
+          BRANCH="digest/${TODAY}"
+          git checkout -b "$BRANCH"
           git add "digests/"
-          git diff --staged --quiet && echo "No changes to commit" || \
-            git commit -m "digest: ${TODAY} [skip ci]"
-          git push
-
-      # ── 6. Optional: open PR for human review ──────────────────────────────
-      # Uncomment the block below if you want a PR review step instead of
-      # direct commit. Requires: gh CLI (pre-installed on ubuntu-latest).
-      #
-      # - name: Open PR for digest review
-      #   if: ${{ github.event.inputs.dry_run != 'true' }}
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     BRANCH="digest/${TODAY}"
-      #     git checkout -b "$BRANCH"
-      #     git add "digests/"
-      #     git commit -m "digest: ${TODAY}"
-      #     git push origin "$BRANCH"
-      #     gh pr create \
-      #       --title "Daily digest: ${TODAY}" \
-      #       --body "Auto-generated AI news digest. Review and merge to publish." \
-      #       --base main \
-      #       --head "$BRANCH" \
-      #       --label "ai-digest"
+          git diff --staged --quiet || git commit -m "digest: ${TODAY}"
+          git push origin "$BRANCH" --force
+          gh pr create \
+            --title "Daily digest: ${TODAY}" \
+            --body "Auto-generated AI news digest. Review the links and merge to publish." \
+            --base main \
+            --head "$BRANCH" \
+            --label "ai-digest" || echo "PR already exists"
 
       # ── 7. Post to Slack (optional) ─────────────────────────────────────────
       # Set SLACK_WEBHOOK secret and uncomment:
